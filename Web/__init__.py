@@ -3,7 +3,7 @@ import pyautogui as pyg
 import requests
 
 
-def url_getter(webName, **kwargs):
+def url_setter(webName, **kwargs):
     if kwargs == True:
     	url = f"https://www.{webName}/"
     elif kwargs != True:
