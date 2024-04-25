@@ -15,10 +15,9 @@ Input = input("Write the Website Name with (.com / .org / etc)\nand you can add 
 url = url_getter(Input)
 
 web.open(url)
-r = requests.get(url)
-if r.status_code == 200:
-	print("Window succesfully opened.")
 
 time.sleep(15)
 
 image = pyg.screenshot("screenshot.png")
+
+
