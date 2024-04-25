@@ -1,2 +1,3 @@
 # VOID
-Trading framework
+Trading framework that uses LLMs to trades stocks and ETFs 
+
