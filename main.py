@@ -1,9 +1,8 @@
-print("this is a gti repo in repl.it")
+import pyautogui as pyg
+import webbrowser as web
 
-userIn = input("input anything....")
+pyg.write()
 
-if type(userIn) == int:
-	print("you entered an Integer!!!!")
-
-else:
-	print("You didi not enter an integer")
+class Trade:
+    def trade(self, Var):
+        print(F"")
