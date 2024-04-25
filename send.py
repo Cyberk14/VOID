@@ -28,10 +28,9 @@ def main():
     i = 0
     while i != len(messg):
         web.open_new_tab(f"https://wa.me/{phone_nums[i]}?text={messg[i]}")
-        i += 1
-
         sleep(4)
         pyg.press("enter")
+        i+=1
     print("The main func is running properly....")
 
 
