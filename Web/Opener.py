@@ -2,8 +2,8 @@ from bs4 import BeautifulSoup as BS
 import requests
 
 class Web:
-    def url_setter(self):
-        user = input("Enter a search query: ")
+    def googleSearchQuery(self):
+        user = input("Input your search query: ")
         for i in user:
             if i == " ":
                 user = user.replace(" ", "+")

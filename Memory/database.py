@@ -1,7 +1,14 @@
 import sqlite3 as sql
-# import embedder
-# import raw_data 
+# import embedder using the google embedders.
 
+# import raw_data deactivate
+
+def database():
+    conn = sql.connect("remoteMemory")
+    c = conn.cursor()
+    
+    c
+    
 class Memory:
     # retrives data to turn it into workable chunks.
     def get_memory(self, raw_data):

@@ -1,5 +1,4 @@
 {
-    "editor.fontSize": 16,
     "editor.quickSuggestions": {
         "comments": "inline",
         "strings": "on"
@@ -7,12 +6,14 @@
     "editor.suggest.localityBonus": true,
     "editor.suggest.insertMode": "replace",
     "editor.snippetSuggestions": "bottom",
-    "editor.quickSuggestionsDelay": 5,
+    "editor.quickSuggestionsDelay": 1,
     "editor.suggest.preview": true,
     "editor.wordBasedSuggestions": "currentDocument",
     "files.autoSave": "afterDelay",
     "files.autoSaveDelay": 10,
     "files.autoSaveWorkspaceFilesOnly": true,
     "workbench.hover.delay": 50,
-    "workbench.preferredDarkColorTheme": "Monokai"
+    "workbench.preferredDarkColorTheme": "Monokai",
+    "editor.cursorBlinking": "smooth",
+    "editor.fontSize": 16
 }

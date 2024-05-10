@@ -1,8 +1,9 @@
 import pyautogui as pyg
-import webbrowser as web
+import time
 
-pyg.write()
+time.sleep(2)
+screen = pyg.screenshot(allScreens=True)
+screen = screen.save("screen.png")
 
-class Trade:
-    def trade(self, Var):
-        print(F"")
+time.sleep(7)
+pyg.locateOnScreen("screen.png", grayscale=True)
