@@ -1,13 +1,25 @@
-import sqlite3 as sql
+import json
+import collected
 # import embedder using the google embedders.
 
 # import raw_data deactivate
 
+def embedder():
+    pass
+
 def database():
-    conn = sql.connect("remoteMemory")
-    c = conn.cursor()
+    embeddings = embedder()
+    data = collected
     
-    c
+    dict = {}
+    for x, y in data, embeddings:
+        dict[x]= y
+        
+    with open("jsonData.json", "w+") as jsonData:
+        jsonData.write(jsonData.dumps(dict))
+        jsonData.close()
+        
+        
     
 class Memory:
     # retrives data to turn it into workable chunks.
