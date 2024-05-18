@@ -14,10 +14,3 @@ class Tool:
         
         self.tools.append(toolist)
         
-webBrowser = Tool("webBrowser",
-                  "used when in need for searching",
-                  "web.search(query)")
-
-webBrowser.saveTool()
-
-print(webBrowser.tools)
