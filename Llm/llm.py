@@ -1,5 +1,8 @@
 import google.generativeai as genai
 import os
+from Tools import web, tools
+from Tools.tools import tool
+
 
 
 os.environ["GOOGLE_API_KEY"] = "AIzaSyA8j9C2iflu3S-xFNg0KJfNSjeBpKvpzXY"
@@ -14,9 +17,11 @@ Your Memory is divided into two Long-term: Used for storing New Facts and Info y
 3: Incase you want to know something new you you can all browse the web to make it easier for you when researching.
 """
 
-def getAnswer():
-    model = genai.GenerativeModel("gemini-pro")
-
-    response = model.generate_content('hi, i am Nasser whats your name')
-
+class LLM:
+    def __init__(self):
+        self.model = genai.GenerativeModel("gemini-pro")
+        return self.model
     
+@tool()
+
+
