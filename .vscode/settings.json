@@ -15,9 +15,10 @@
     "workbench.hover.delay": 50,
     "workbench.preferredDarkColorTheme": "Monokai",
     "editor.cursorBlinking": "smooth",
-    "editor.fontSize": 16,
-    "python.REPL.enableREPLSmartSend": false,
+    "editor.fontSize": 17,
+    "python.REPL.enableREPLSmartSend": true,
     "cSpell.words": [
         "toolist"
-    ]
+    ],
+    "python.analysis.typeCheckingMode": "strict"
 }

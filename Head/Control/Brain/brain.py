@@ -1,26 +1,29 @@
 # this will be used to process the input from the "Input" folder for storage, re-use and output!
 
+import os
 import google.generativeai as genai
 import PIL.Image
+from Lower_Torso.Tools.tools import tool_list
+
 
 
 genai.configure(api_key=os.environ['API_KEY'])
 
-model = genai.GenerativeModel(name='models/gemini-pro')
+model = genai.GenerativeModel(model_name='models/gemini-pro')
 
 def send(prompt):
     response = model.generate_content(prompt)
     return response.text
     
-def state(self):
-    return state    
+def state():
+    return state
 
 class _Brain:
     def __init__(self) -> None:
         self.message = f"""
-Your name is 'VOID' and tis is your brain{model.name} 
-capable of understanding complex stuff like images, pdfs, essays, papers, financial indicators, hidden code and so-much more.
-you can use it to trade forex, stocks, sentiment the market_news, government policies and most important of all you can predict future trends correctly based on the info you have collected using the tools {tool_set} you
+Your name is 'VOID' and tis is your brain{model.model_name}, 
+capable of understanding complex stuff like images, PDF, essays, papers, financial indicators, hidden code and so-much more.
+you can use it to trade forex, stocks, sentiment the market_news, government policies and most important of all you can predict future trends correctly based on the info you have collected using the tools {tool_list} you
 have at hand.
 
 You human like Organs like eyes, ears and a mouth that you can use to perform an action according to its suitable function, like:
@@ -29,7 +32,7 @@ Ears: for hearing the latest news adhered to financial world.
 
 use it carefully!!
 """
-    self.state = state()
+        self.state = state()
 
     
     def interpret(self, image=None, *args, **kwargs):
@@ -38,7 +41,7 @@ use it carefully!!
     Based on the info provided and Using your interpreting/understanding/sentimentalizing capabilities interpret and summarize this info {args} or {kwargs} in bullet points or in a the way you 
     would understand it better and allow use it later but still carrying the same value as it carries now. from that same info also outline the info that worth remembering on the bottom. 
     """    
-        if image == None:
+        if image is None:
             self.interpretation = send(prompt)
             return self.interpretation
         else:

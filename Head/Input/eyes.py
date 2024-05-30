@@ -1,42 +1,16 @@
 # this file will be used to see/spot the info the internet an the files the use r will have complied inform of .pdf files and images.
 
-from pypdf import PdfReader
-from playwright.sync_api import sync_playwright
+from Lower_Torso.Tools.tools import _web
 
-class _eyes:
-    def read_pdf(self, data):
-        paper = PdfReader("paper.pdf")
-        content = paper.pages[0]
+class _Eyes:
+    def __init__(self, query=None, image=None, data=None, *args, **kwargs):
+        self.message = "these are your eyes, You use them to read and send the info read to the brain you read all kinds of info like text(PDF files, youtube transcripts, market_news, SEC_fillings, etc) and Images(chart_images, screen_shots or any images)"
+        self.query = query
+        self.data = data
+        self.args = args
+        self.kwargs = kwargs
+        self.Image = image
+        self.lens = _web()
         
-    def read_web(self, *args):
-        web = _web()
-        google_search = web.google(args)
+    def use(self):
         
-        market_news = web.market_news()
-        
-        return google_search, market_news
-    
-    
-class _web:
-    def google(self, query):
-        def browser():
-            browser = P.Chromium.launch()
-            page = browser.new_page()
-            page.goto(f"https://google.com/?q={query}")
-            page.screenshot("Control/Brain/web_pic.png")
-    
-            page.close()
-        with sync_playwright as P:
-            browser()
-            
-    def market_news():
-        def browser():
-            browser = P.Chromium.launch()
-            page = browser.new_page()
-            page.goto("https://www.marketwatch.com/")
-            page.screenshot("Control/Brain/web_pic.png")
-    
-            page.close()
-        with sync_playwright as P:
-            browser()
-            
