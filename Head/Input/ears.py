@@ -1,8 +1,9 @@
-# the ear file will used to hear events in the financial field/space or any other relevant info that will used to archive the goals set.
+# the ear file will be used to listen to USER and work-mate Ai-AGENTS prompts.
 
-Alpha_Vantage = "api_key"
-
-class Ears:
-    def __init__(self):
-        pass
+class _ears:
+    def listen(self):
+        prompt = input("Listening: ")
+        return prompt
     
+ears = _ears()
+message = ears.listen()

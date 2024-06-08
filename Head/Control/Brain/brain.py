@@ -3,23 +3,23 @@
 import os
 import google.generativeai as genai
 import PIL.Image
-from Lower_Torso.Tools.tools import tool_list
+from Lower_Torso.Tools.tools import tool_list # type: ignore
+from Head.Input.ears import message
 
 
-
-genai.configure(api_key=os.environ['API_KEY'])
+genai.configure(api_key=os.environ['API_KEY']) # type: ignore
 
 model = genai.GenerativeModel(model_name='models/gemini-pro')
 
-def send(prompt):
-    response = model.generate_content(prompt)
+def send(arg):
+    response = model.generate_content(arg) # type: ignore
     return response.text
     
 def state():
     return state
 
-class _Brain:
-    def __init__(self) -> None:
+class Brain:
+    def __init__(self):
         self.message = f"""
 Your name is 'VOID' and tis is your brain{model.model_name}, 
 capable of understanding complex stuff like images, PDF, essays, papers, financial indicators, hidden code and so-much more.
@@ -33,29 +33,35 @@ Ears: for hearing the latest news adhered to financial world.
 use it carefully!!
 """
         self.state = state()
+        self.goal = f"Briefly and concisely define the goal of the prompt below \n {message}"
 
-    
-    def interpret(self, image=None, *args, **kwargs):
-        picture = PIL.Image.open("screenshot.png")
+    def _interpret(self, image=None, *args: str, **kwargs: str) -> str: # type: ignore
+        picture = PIL.Image.open("screenshot.png") # type: ignore
         prompt = f"""
     Based on the info provided and Using your interpreting/understanding/sentimentalizing capabilities interpret and summarize this info {args} or {kwargs} in bullet points or in a the way you 
     would understand it better and allow use it later but still carrying the same value as it carries now. from that same info also outline the info that worth remembering on the bottom. 
     """    
         if image is None:
-            self.interpretation = send(prompt)
-            return self.interpretation
-        else:
+            interpretation = send(prompt)
+            return interpretation
+        elif image is not None:
             prompt = [prompt, picture]
-            self.interpretation = send(prompt)
-            return self.interpretation
-            
+            interpretation = send(prompt)
+            return interpretation
 
-    def decide(self, data):
+    def _decide(self):
+        self.interpretation = self._interpret()
         prompt = f"""
-Based on the the interpretation below ({self.interpretation}) that you your made make a decision based on the current state {self.state},
-
+Based on the the interpretation below ({self.interpretation}) that you your made make a decision based on the current state {self.state}, 
+that will lead you closest to you defined goal({self.goal})
 """
 
         decision = send(prompt)
         return decision
 
+    def memory(self):
+        prompt = f"""
+from the interpretation: {self.interpretation} you made earlier remove what is important for you to remember and will help you to learn something, outline them in points.
+        """
+        memory = send(prompt)
+        return memory
