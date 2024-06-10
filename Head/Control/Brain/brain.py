@@ -11,17 +11,8 @@ genai.configure(api_key=os.environ['API_KEY']) # type: ignore
 
 model = genai.GenerativeModel(model_name='models/gemini-pro')
 
-def send(arg):
-    response = model.generate_content(arg) # type: ignore
-    return response.text
-    
-def state():
-    return state
-
-class Brain:
-    def __init__(self):
-        self.message = f"""
-Your name is 'VOID' and tis is your brain{model.model_name}, 
+init_message = f"""
+Your name is 'VOID' and this is your brain ||{model.model_name}||,
 capable of understanding complex stuff like images, PDF, essays, papers, financial indicators, hidden code and so-much more.
 you can use it to trade forex, stocks, sentiment the market_news, government policies and most important of all you can predict future trends correctly based on the info you have collected using the tools {tool_list} you
 have at hand.
@@ -32,36 +23,68 @@ Ears: for hearing the latest news adhered to financial world.
 
 use it carefully!!
 """
+
+def send_img(arg: str, image):
+    init_prompt = f"""
+    {init_message} \\
+        so answer the prompt as need be:
+    `{arg}`
+    """
+    final_prompt = [init_prompt, image]
+    response = model.generate_content(final_prompt, stream=True) # type: ignore
+    
+    return response.text
+
+def send_str(arg: str):
+    init_prompt = f"""
+    {init_message} \\
+        so answer to the prompt below as need be:
+    `{arg}`
+    """
+    
+    response = model.generate_content(init_prompt, stream=True) # type: ignore
+    return response.text
+    
+def state():
+    prompt = f"""
+    ``These is a prompt made specifically to let you be aware for you current and Previous BUT only the last five states will be given to you to save time and space``
+    
+    prompt : {previous_prompt} 
+    """
+    return state
+
+class Brain:
+    def __init__(self):
         self.state = state()
         self.goal = f"Briefly and concisely define the goal of the prompt below \n {message}"
 
-    def _interpret(self, image=None, *args: str, **kwargs: str) -> str: # type: ignore
-        picture = PIL.Image.open("screenshot.png") # type: ignore
+    def interpret(self, arg: str, image=None):
+        picture = PIL.Image.open(image, mode="r") # type: ignore
         prompt = f"""
-    Based on the info provided and Using your interpreting/understanding/sentimentalizing capabilities interpret and summarize this info {args} or {kwargs} in bullet points or in a the way you 
+    Based on the info provided and Using your interpreting/understanding/sentimentalizing capabilities interpret and summarize this info {arg} in bullet points or in a the way you 
     would understand it better and allow use it later but still carrying the same value as it carries now. from that same info also outline the info that worth remembering on the bottom. 
     """    
         if image is None:
-            interpretation = send(prompt)
+            interpretation = send_str(prompt)
             return interpretation
         elif image is not None:
-            prompt = [prompt, picture]
-            interpretation = send(prompt)
+            interpretation = send_img(prompt, picture)
             return interpretation
 
-    def _decide(self):
-        self.interpretation = self._interpret()
+    def decide(self):
+        self.interpretation = self.interpret()
         prompt = f"""
 Based on the the interpretation below ({self.interpretation}) that you your made make a decision based on the current state {self.state}, 
 that will lead you closest to you defined goal({self.goal})
 """
 
-        decision = send(prompt)
+        decision = send_str(prompt)
         return decision
 
     def memory(self):
         prompt = f"""
 from the interpretation: {self.interpretation} you made earlier remove what is important for you to remember and will help you to learn something, outline them in points.
         """
-        memory = send(prompt)
+        memory = send_str(prompt)
         return memory
+    
