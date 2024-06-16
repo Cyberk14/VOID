@@ -3,12 +3,26 @@
 
 from brain import Brain, send_str
 import sqlite3 as sq
+from typing import List
+from Head.Input.eyes import see
+import requests
+import json
+
+text  =
+
+url = 'https://api.jina.ai/v1/embeddings'
+
+headers = {
+  'Content-Type': 'application/json',
+  'Authorization': 'Bearer jina_58f091b726fc400fa28a97ddb9433138j2pVDg8MDJLJUH9jJkC-PkNPh2dh'
+}
+
 
 # contextual Memory database.
 conn = sq.connect('memory.db')
 cursor = conn.cursor()
 
-cursor.execute(""" CREATE TABLE IF NOT EXISTS context()""")
+cursor.execute(""" CREATE TABLE IF NOT EXISTS context(Token , Vector)""")
 
 def trash_memory():
     prompt = f'''
@@ -18,26 +32,47 @@ def trash_memory():
     memory_sum = send_str(prompt)
     return memory_sum
 
-def embed(data: str):
-    return data
+def chunck(text: str = text):
+    sent = text.split(' ')
 
-def chuncker():
-    
-tokens = []
-epoch = 20
-s_epoch = 20
-start = 0
-for s in sent:
-    s = sent[start:epoch]
-    if not s:
-        s = sent[epoch-s_epoch:]
-    tokens.append(s)
-    start+=epoch
-    epoch+=s_epoch
-    
-    if len(s) == 0:
-        break
-    tokens.pop()
-    
+    tokens = []
+    epoch = 20
+    start = 0
+
+    while start < len(sent):
+        s = sent[start:start + epoch]
+        tokens.append(' '.join(s))
+        start += epoch
+        
     return tokens
+
+def embed(tokens: List[str]):
+    vectors = {}
     
+    for token in tokens:
+        data = {
+    'input': token,
+    'model': 'jina-embeddings-v2-base-en',
+    'encoding_type': 'float'
+    }
+        response = requests.post(url, headers=headers, json=data).json()
+        embedding = response['data'][0]['embedding']
+        
+        vectors[token]=embedding
+
+    return vectors
+
+def add_mem_db():
+    tokens = chunck()
+    vectors = embed(tokens)
+    
+    tokens = vectors.keys()
+    vectors = vectors.values()
+    
+    for token, vector in zip(tokens, vectors): # type: ignore
+        cursor.execute('INSERT INTO TABLE (Token, Vector)  VALUES (?, ?)',(token, vector)) # type: ignore
+        conn.commit()
+    
+    conn.close()
+    print("DataBase updated successfully!")
+
