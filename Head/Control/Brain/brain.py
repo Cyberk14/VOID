@@ -3,11 +3,15 @@
 import os
 import google.generativeai as genai
 import PIL.Image
-from Lower_Torso.tool.tools import tool_list # type: ignore
 from Head.Input.ears import listen
-from Head.Input.eyes import eye
+from Head.Input.eyes import see
 import time
+from termcolor import colored
+tool_list = []
+data_from_eyes = see(tool_list)
 
+
+os.environ["API_KEY"] = "AIzaSyA8j9C2iflu3S-xFNg0KJfNSjeBpKvpzXY"
 
 genai.configure(api_key=os.environ['API_KEY']) # type: ignore
 
@@ -27,16 +31,17 @@ use it carefully!!
 """
 
 Time = (lambda: time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()))()
-
+message = listen()
 def send_img(arg: str, image: str|None=None):
     image = PIL.Image.open(image)
     init_prompt = f"""
-    {init_message} \\
+    {init_message}<- this is a system prompt no need to its contents in anyway just you for referral and context awareness \\
         so answer the prompt as need be:
     `{arg}`
     """
     final_prompt = [init_prompt, image]
     response = model.generate_content(final_prompt, stream=True) # type: ignore
+    response.resolve()
     return response.text
 
 def send_str(arg: str):
@@ -46,7 +51,8 @@ def send_str(arg: str):
     ``{arg}``
     """
     
-    response = model.generate_content(init_prompt, stream=True) # type: ignore
+    response = model.generate_content(init_prompt)
+    response.resolve()
     return response.text
     
 def state():
@@ -73,32 +79,47 @@ class Brain:
         the time now is: {Time}
         
     Based on the info provided and Using your interpreting/understanding/sentimentalizing capabilities interpret and summarize this info {arg} in bullet points or in a the way you 
-    would understand it better and allow use it later but still carrying the same value as it carries now. from that same info also outline the info that worth remembering on the bottom. 
-    """    
+    would understand it better and allow use it later but still carrying the same value as it carries now. Always remember no need to remember to output this info just display like this: 'Interpretation: ``interpretation_goes_here``  || KEEP IT SIMPLE AND SHORT BUT UNDERSTANDABLE'
+"""    
         if not image:
             interpretation = send_str(prompt)
+            print(colored(interpretation, 'green'))
             return interpretation
         else:
             interpretation = send_img(prompt, image)
+            print(colored(interpretation, 'green'))
             return interpretation
 
     def decide(self):
         self.interpretation = self.interpret()
         prompt = f"""
 Based on the interpretation you made below: ({self.interpretation}) of this information:  make a decision based on the current state {self.state}, 
-that will lead you closest to you defined goal({self.goal})
+that will lead you closest to you defined goal({self.goal}). 
+Always remember no need to remember to output this info just display like this: 'Decision: ``decision_goes_here``  || KEEP IT SIMPLE AND SHORT BUT UNDERSTANDABLE'
 """
 
         decision = send_str(prompt)
+        
+        print(colored(decision, "red"))
         return decision
 
+    def respond(self):
+        decision = self.decide()
+        prompt = f"""
+You received the following message: "{message}".
+You interpreted it as: "{self.interpretation}".
+Based on this interpretation, you decided: "{decision}".
+
+Now, please respond naturally as if you are talking to a human. Here is your response:
+"""
+
+        response = send_str(prompt)
+        print(colored(response, 'blue'))
+        return response
+        
     def memory(self):
         prompt = f"""
 from the interpretation: {self.interpretation} you made earlier remove what is important for you to remember and will help you to learn something, outline them in points.
         """
         memory = send_str(prompt)
         return memory
-    
-if __name__ == '__main__':
-    Brain = Brain()
-    

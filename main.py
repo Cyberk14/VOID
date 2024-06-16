@@ -1,4 +1,8 @@
-import time
+from Head.Control.Brain.brain import Brain
+from Head.Output.mouth import speak
 
-Time = (lambda: time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()))()
-print(Time)
+if __name__ == '__main__':
+    agent = Brain()
+    print(agent.interpret())
+    print(agent.decide())
+
