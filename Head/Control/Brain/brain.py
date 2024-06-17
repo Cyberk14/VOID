@@ -87,8 +87,6 @@ class Brain:
     Based on the info provided and Using your interpreting/understanding/sentimentalizing capabilities interpret and summarize this info {arg} in bullet points or in a the way you 
     would understand it better and allow use it later but still carrying the same value as it carries now. Always remember no need to remember to output this info just display like this: 'Interpretation: ``interpretation_goes_here``  || KEEP IT SIMPLE AND SHORT BUT UNDERSTANDABLE'
 """    
-    would understand it better and allow use it later but still carrying the same value as it carries now. Always remember no need to remember to output this info just display like this: 'Interpretation: ``interpretation_goes_here``  || KEEP IT SIMPLE AND SHORT BUT UNDERSTANDABLE'
-"""    
         if not image:
             interpretation = send_str(prompt)
             print(colored(interpretation, 'green'))
