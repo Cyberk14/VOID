@@ -5,6 +5,7 @@ import google.generativeai as genai
 import PIL.Image
 from Head.Input.ears import listen
 from Head.Input.eyes import see
+from Head.Input.eyes import see
 import time
 from termcolor import colored
 tool_list = []
@@ -32,15 +33,18 @@ use it carefully!!
 
 Time = (lambda: time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()))()
 message = listen()
+message = listen()
 def send_img(arg: str, image: str|None=None):
     image = PIL.Image.open(image)
     init_prompt = f"""
+    {init_message}<- this is a system prompt no need to its contents in anyway just you for referral and context awareness \\
     {init_message}<- this is a system prompt no need to its contents in anyway just you for referral and context awareness \\
         so answer the prompt as need be:
     `{arg}`
     """
     final_prompt = [init_prompt, image]
     response = model.generate_content(final_prompt, stream=True) # type: ignore
+    response.resolve()
     response.resolve()
     return response.text
 
@@ -51,6 +55,8 @@ def send_str(arg: str):
     ``{arg}``
     """
     
+    response = model.generate_content(init_prompt)
+    response.resolve()
     response = model.generate_content(init_prompt)
     response.resolve()
     return response.text
@@ -81,6 +87,8 @@ class Brain:
     Based on the info provided and Using your interpreting/understanding/sentimentalizing capabilities interpret and summarize this info {arg} in bullet points or in a the way you 
     would understand it better and allow use it later but still carrying the same value as it carries now. Always remember no need to remember to output this info just display like this: 'Interpretation: ``interpretation_goes_here``  || KEEP IT SIMPLE AND SHORT BUT UNDERSTANDABLE'
 """    
+    would understand it better and allow use it later but still carrying the same value as it carries now. Always remember no need to remember to output this info just display like this: 'Interpretation: ``interpretation_goes_here``  || KEEP IT SIMPLE AND SHORT BUT UNDERSTANDABLE'
+"""    
         if not image:
             interpretation = send_str(prompt)
             print(colored(interpretation, 'green'))
@@ -94,6 +102,8 @@ class Brain:
         self.interpretation = self.interpret()
         prompt = f"""
 Based on the interpretation you made below: ({self.interpretation}) of this information:  make a decision based on the current state {self.state}, 
+that will lead you closest to you defined goal({self.goal}). 
+Always remember no need to remember to output this info just display like this: 'Decision: ``decision_goes_here``  || KEEP IT SIMPLE AND SHORT BUT UNDERSTANDABLE'
 that will lead you closest to you defined goal({self.goal}). 
 Always remember no need to remember to output this info just display like this: 'Decision: ``decision_goes_here``  || KEEP IT SIMPLE AND SHORT BUT UNDERSTANDABLE'
 """
