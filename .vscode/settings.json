@@ -18,6 +18,8 @@
     "editor.fontSize": 17,
     "python.REPL.enableREPLSmartSend": true,
     "cSpell.words": [
+        "contextual",
+        "Cyberk",
         "toolist"
     ],
     "python.analysis.typeCheckingMode": "strict"

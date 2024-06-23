@@ -1,20 +1,17 @@
 # this will be used to store info that will be used in the future like dates times or more important info 
 # that including certain skills and ways of doing a thing ie "learning". 
 
-from brain import Brain, send_str
 import sqlite3 as sq
 from typing import List
-from Head.Input.eyes import see
+import utils
 import requests
-import json
 
-text  =
 
 url = 'https://api.jina.ai/v1/embeddings'
 
 headers = {
-  'Content-Type': 'application/json',
-  'Authorization': 'Bearer jina_58f091b726fc400fa28a97ddb9433138j2pVDg8MDJLJUH9jJkC-PkNPh2dh'
+    'Content-Type': 'application/json',
+    'Authorization': 'Bearer jina_58f091b726fc400fa28a97ddb9433138j2pVDg8MDJLJUH9jJkC-PkNPh2dh'
 }
 
 
@@ -22,17 +19,9 @@ headers = {
 conn = sq.connect('memory.db')
 cursor = conn.cursor()
 
-cursor.execute(""" CREATE TABLE IF NOT EXISTS context(Token , Vector)""")
+cursor.execute(""" CREATE TABLE IF NOT EXISTS context(Token TEXT NOT NULL, Vector TEXT NOT NULL)""")
 
-def trash_memory():
-    prompt = f'''
-    your Brain would want ``trash some`` of its Memory: >>>{memory_to_trash}<<< to save some space but before it does so. Can you summarize and compress it to a small but still in an understandable format/way.
-    '''
-    
-    memory_sum = send_str(prompt)
-    return memory_sum
-
-def chunck(text: str = text):
+def chunck(text: str):
     sent = text.split(' ')
 
     tokens = []
@@ -62,17 +51,38 @@ def embed(tokens: List[str]):
 
     return vectors
 
-def add_mem_db():
+def add_mem_db(vector, token):
     tokens = chunck()
-    vectors = embed(tokens)
-    
-    tokens = vectors.keys()
-    vectors = vectors.values()
-    
-    for token, vector in zip(tokens, vectors): # type: ignore
-        cursor.execute('INSERT INTO TABLE (Token, Vector)  VALUES (?, ?)',(token, vector)) # type: ignore
-        conn.commit()
-    
+    vector = embed()
+
+    cursor.execute('INSERT INTO MemoryTable (Token, Vector) VALUES (?, ?)', (token, vector))
+    conn.commit()
     conn.close()
     print("DataBase updated successfully!")
+
+
+def previous_5(switch:bool=False):
+    if switch:
+        with open('D:\\New folder\\VOID\\previous_five.txt', 'r+', encoding='utf-8') as file:
+            text = file.read()
+            
+            previous = text.split('---')
+            
+        if len(previous) == 5:
+            prompt = f"""
+            from this piece of text is the contextual memory buffer and its going to br 
+            deleted but before its deleted remove only and only the relevant that needs to be 
+            stored for future use {previous[0]}, if there no info to be stored return the word 'None'
+            """
+            response = utils.send_str(prompt)
+            if 'none' in response.lower():
+                pass
+            else:
+                with open('D:\\New folder\\VOID\\previous_five.txt', 'w', encoding='utf-8') as file:
+                    previous.remove(previous[0])
+                    for i in previous:
+                        file.write(i)
+                    print("upadated and stored")
+
+    return None
 

@@ -1,94 +1,48 @@
 # this will be used to process the input from the "Input" folder for storage, re-use and output!
-
-import os
-import google.generativeai as genai
-import PIL.Image
+from .memory import previous_5
+import utils
 from Head.Input.ears import listen
 from Head.Input.eyes import see
-from Head.Input.eyes import see
-import time
+
+from typing import List, Dict, Literal, Any
 from termcolor import colored
-tool_list = []
-data_from_eyes = see(tool_list)
 
 
-os.environ["API_KEY"] = "AIzaSyA8j9C2iflu3S-xFNg0KJfNSjeBpKvpzXY"
 
-genai.configure(api_key=os.environ['API_KEY']) # type: ignore
+def state():# -> Any:
+    prompt = """
+    ``These is a prompt made specifically to let you be aware for you current and Previous BUT only the last five states will be given to you to save time and space``
+    
+    Previous Dialogue: {dialogue} \\
 
-model = genai.GenerativeModel(model_name='models/gemini-1.5-flash-latest')
-
-init_message = f"""
-Your name is 'VOID' and this is your brain ||{model.model_name}||,
-capable of understanding complex stuff like images, PDF, essays, papers, financial indicators, hidden code and so-much more.
-you can use it to trade forex, stocks, sentiment the market_news, government policies and most important of all you can predict future trends correctly based on the info you have collected using the tools {tool_list} you
-have at hand.
-
-Your human like Organs like eyes, ears and a mouth that you can use to perform an action according to its suitable function, like:
-Eyes: for reading and viewing different pieces of the world of trading (you can even watch Youtube videos using your eyes!!)
-Ears: for hearing the latest news adhered to financial world.
-
-use it carefully!!
-"""
-
-Time = (lambda: time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()))()
-message = listen()
-message = listen()
-def send_img(arg: str, image: str|None=None):
-    image = PIL.Image.open(image)
-    init_prompt = f"""
-    {init_message}<- this is a system prompt no need to its contents in anyway just you for referral and context awareness \\
-    {init_message}<- this is a system prompt no need to its contents in anyway just you for referral and context awareness \\
-        so answer the prompt as need be:
-    `{arg}`
-    """
-    final_prompt = [init_prompt, image]
-    response = model.generate_content(final_prompt, stream=True) # type: ignore
-    response.resolve()
-    response.resolve()
-    return response.text
-
-def send_str(arg: str):
-    init_prompt = f"""
-    ``{init_message}`` \\
-        so answer to the prompt below as need be:
-    ``{arg}``
+    Previous Actions: {actions} \\
+        
+    
     """
     
-    response = model.generate_content(init_prompt)
-    response.resolve()
-    response = model.generate_content(init_prompt)
-    response.resolve()
-    return response.text
-    
-def state():
-    # prompt = f"""
-    # ``These is a prompt made specifically to let you be aware for you current and Previous BUT only the last five states will be given to you to save time and space``
-    
-    # Previous Dialogue: {dialogue} \\
-
-    # Previous Actions: {actions} \\
-    # """
-    
-    # state = send_str(prompt)
+    state = utils.send_str(prompt)
     return state
 
 class Brain:
     def __init__(self):
         # info = eye()
+        self.message = listen()
         
         self.state = state()
-        self.goal = f"Briefly and concisely define the goal of the prompt below \n {message}"
+        self.goal = f"Briefly and concisely define the goal of the prompt below \n {self.message}"
 
-    def interpret(self, arg: str = message, image: str|None=None):
+    def interpret(self, image: str|None=None):
         prompt = f"""
-        the time now is: {Time}
+        You have received this self.message interpret it and understand its core values and meanings: "{self.message}"
         
-    Based on the info provided and Using your interpreting/understanding/sentimentalizing capabilities interpret and summarize this info {arg} in bullet points or in a the way you 
-    would understand it better and allow use it later but still carrying the same value as it carries now. Always remember no need to remember to output this info just display like this: 'Interpretation: ``interpretation_goes_here``  || KEEP IT SIMPLE AND SHORT BUT UNDERSTANDABLE'
-"""    
+        Summarize the content in bullet points or in a clear and concise format, ensuring it retains its original meaning and value.
+        
+        Display the interpretation as follows:
+        'Interpretation: ``Based on (this) or (that) I interpreted as (interpretation_goes_here)``'
+        """
+
         if not image:
-            interpretation = send_str(prompt)
+            interpretation = utils.send_str(prompt)
             print(colored(interpretation, 'green'))
             return interpretation
         else:
@@ -98,36 +52,36 @@ class Brain:
 
     def decide(self):
         self.interpretation = self.interpret()
-        prompt = f"""
-Based on the interpretation you made below: ({self.interpretation}) of this information:  make a decision based on the current state {self.state}, 
-that will lead you closest to you defined goal({self.goal}). 
-Always remember no need to remember to output this info just display like this: 'Decision: ``decision_goes_here``  || KEEP IT SIMPLE AND SHORT BUT UNDERSTANDABLE'
-that will lead you closest to you defined goal({self.goal}). 
-Always remember no need to remember to output this info just display like this: 'Decision: ``decision_goes_here``  || KEEP IT SIMPLE AND SHORT BUT UNDERSTANDABLE'
-"""
+        prompt = f""" 
+    Based on the provided self.message and your interpretation that you made, make a decision considering the following:
+    User/Fellow Agent's self.Message: "{self.message}"
+    Your Interpretation: "{self.interpretation}"
+    
+    Display the decision as follows:
+    'Decision: ``I have decided that (decision_goes_here)``'
+    """
 
-        decision = send_str(prompt)
+        decision = utils.send_str(prompt)
         
         print(colored(decision, "red"))
         return decision
 
-    def respond(self):
+    def respond(self) -> tuple[str, Any, Any, Any]:
         decision = self.decide()
         prompt = f"""
-You received the following message: "{message}".
+You received the following prompt: "{self.message}".
 You interpreted it as: "{self.interpretation}".
-Based on this interpretation, you decided: "{decision}".
+Based on this interpretation and the prompt, you decided: "{decision}".
+if you dont know something or a fact dont print it!!!!! 
 
-Now, please respond naturally as if you are talking to a human. Here is your response:
+Now, please respond as human, naturally as if you are talking to a human companion/friend. Adopt to slang speech pattern. Here is your response:
 """
 
-        response = send_str(prompt)
+        response = utils.send_str(prompt)
         print(colored(response, 'blue'))
-        return response
         
-    def memory(self):
-        prompt = f"""
-from the interpretation: {self.interpretation} you made earlier remove what is important for you to remember and will help you to learn something, outline them in points.
-        """
-        memory = send_str(prompt)
-        return memory
+        conversation = utils.conv_cont(self.message, self.interpretation, decision, response)
+        # utilities.text_to_speech_file(response)
+        previous_5(True)
+        
+        return conversation

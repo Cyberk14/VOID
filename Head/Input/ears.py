@@ -2,7 +2,7 @@
 
 
 def listen():
-    prompt = input("Listening: ")
+    prompt = input("Listening♙♙ ")
     return prompt
 
 
