@@ -1,23 +1,14 @@
-import sqlite3 as sq 
-def add_mem_db(vector, token):
-    conn = sq.connect('memory.db')
-    cursor = conn.cursor()
+from urllib.parse import urlencode, urlunparse
+from urllib.request import urlopen, Request
+from bs4 import BeautifulSoup
 
-    cursor.execute(""" CREATE TABLE IF NOT EXISTS context(Token , Vector)""")
-        
-    # tokens = chunck()
-    # vectors = embed(tokens)
-    
-    # tokens = vectors.keys()
-    # vectors = vectors.values()
-    
-    
-    
-    # for token, vector in zip(tokens, vectors): # type: ignore
-    cursor.execute('INSERT INTO TABLE context(Token, Vector)  VALUES (?, ?)',(token, vector)) # type: ignore
-    conn.commit()
-    
-    conn.close()
-    print("DataBase updated successfully!")
-
-add_mem_db('i fuck you', [0.3, .5, -.4])
+query = "programming"
+url = urlunparse(("https", "www.bing.com", "/search", "", urlencode({"q": query}), ""))
+custom_user_agent = "Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:47.0) Gecko/20100101 Firefox/47.0"
+req = Request(url, headers={"User-Agent": custom_user_agent})
+page = urlopen(req)
+# Further code I've left unmodified
+soup = BeautifulSoup(page.read(), features='lxml')
+links = soup.findAll("a")
+for link in links:
+    print(link["href"])

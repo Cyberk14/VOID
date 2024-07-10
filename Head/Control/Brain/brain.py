@@ -1,11 +1,12 @@
 # this will be used to process the input from the "Input" folder for storage, re-use and output!
-from .memory import previous_5
+from .memory import update
 import utils
 from Head.Input.ears import listen
 from Head.Input.eyes import see
 
 from typing import List, Dict, Literal, Any
 from termcolor import colored
+import sys
 
 
 
@@ -16,8 +17,6 @@ def state():# -> Any:
     Previous Dialogue: {dialogue} \\
 
     Previous Actions: {actions} \\
-        
-    
     """
     
     state = utils.send_str(prompt)
@@ -25,30 +24,32 @@ def state():# -> Any:
 
 class Brain:
     def __init__(self):
-        # info = eye()
         self.message = listen()
-        
-        self.state = state()
         self.goal = f"Briefly and concisely define the goal of the prompt below \n {self.message}"
 
     def interpret(self, image: str|None=None):
-        prompt = f"""
-        You have received this self.message interpret it and understand its core values and meanings: "{self.message}"
+        if not self.message:
+            print('Goodbye')
+            sys.exit()
         
-        Summarize the content in bullet points or in a clear and concise format, ensuring it retains its original meaning and value.
-        
-        Display the interpretation as follows:
-        'Interpretation: ``Based on (this) or (that) I interpreted as (interpretation_goes_here)``'
-        """
-
-        if not image:
-            interpretation = utils.send_str(prompt)
-            print(colored(interpretation, 'green'))
-            return interpretation
         else:
-            interpretation = send_img(prompt, image)
-            print(colored(interpretation, 'green'))
-            return interpretation
+            prompt = f"""
+            You have received this self.message interpret it and understand its core values and meanings: "{self.message}"
+            
+            Summarize the content in bullet points or in a clear and concise format, ensuring it retains its original meaning and value.
+            
+            Display the interpretation as follows:
+            'Interpretation: ``Based on (this) or (that) I interpreted as (interpretation_goes_here)``'
+            """
+
+            if not image:
+                interpretation = utils.send_str(prompt)
+                print(colored(interpretation, 'green'))
+                return interpretation
+            else:
+                interpretation = utils.send_img(prompt, image)
+                print(colored(interpretation, 'green'))
+                return interpretation
 
     def decide(self):
         self.interpretation = self.interpret()
@@ -61,7 +62,7 @@ class Brain:
     'Decision: ``I have decided that (decision_goes_here)``'
     """
 
-        decision = utils.send_str(prompt)
+        decision = utils.send_str(prompt, snippet=None)
         
         print(colored(decision, "red"))
         return decision
@@ -74,14 +75,14 @@ You interpreted it as: "{self.interpretation}".
 Based on this interpretation and the prompt, you decided: "{decision}".
 if you dont know something or a fact dont print it!!!!! 
 
-Now, please respond as human, naturally as if you are talking to a human companion/friend. Adopt to slang speech pattern. Here is your response:
+Now, respond, Here's your response:
 """
 
-        response = utils.send_str(prompt)
+        response = utils.send_str(prompt, snippet=utils.search(self.message), modelName='gemini-1.5-pro')
         print(colored(response, 'blue'))
         
         conversation = utils.conv_cont(self.message, self.interpretation, decision, response)
         # utilities.text_to_speech_file(response)
-        previous_5(True)
+        update(True)
         
         return conversation
