@@ -4,7 +4,7 @@ import utils
 from Head.Input.ears import listen
 from Head.Input.eyes import see
 
-from typing import List, Dict, Literal, Any
+from typing import Any
 from termcolor import colored
 import sys
 
@@ -59,12 +59,12 @@ class Brain:
     Your Interpretation: "{self.interpretation}"
     
     Display the decision as follows:
-    'Decision: ``I have decided that (decision_goes_here)``'
+    '``I have decided that (decision_goes_here)``'
     """
 
-        decision = utils.send_str(prompt, snippet=None)
-        
+        decision = utils.send_str(prompt, modelName='gemini-1.5-pro')
         print(colored(decision, "red"))
+        utils.action(decision)
         return decision
 
     def respond(self) -> tuple[str, Any, Any, Any]:
@@ -75,10 +75,10 @@ You interpreted it as: "{self.interpretation}".
 Based on this interpretation and the prompt, you decided: "{decision}".
 if you dont know something or a fact dont print it!!!!! 
 
-Now, respond, Here's your response:
+Now, respond as a companion, Here's your response:
 """
 
-        response = utils.send_str(prompt, snippet=utils.search(self.message), modelName='gemini-1.5-pro')
+        response = utils.send_str(prompt, modelName='gemini-1.5-pro')
         print(colored(response, 'blue'))
         
         conversation = utils.conv_cont(self.message, self.interpretation, decision, response)

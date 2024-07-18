@@ -16,7 +16,7 @@
     "workbench.preferredDarkColorTheme": "Monokai",
     "editor.cursorBlinking": "smooth",
     "editor.fontSize": 17,
-    "python.REPL.enableREPLSmartSend": true,
+    "python.REPL.enableREPLSmartSend": false,
     "cSpell.words": [
         "contextual",
         "Cyberk",

@@ -8,8 +8,10 @@ import time
 import numpy as np
 import json
 import requests
-from tools import youtube, Web
+from tools import youtube, search
+import re
 
+from tools import youtube, search
 
 
 os.environ["API_KEY"] = "AIzaSyA8j9C2iflu3S-xFNg0KJfNSjeBpKvpzXY"
@@ -46,10 +48,10 @@ def send_img(arg: str, image: str):
     init_message = f"""
 the current time is {Time}
 
-Your name is 'XENIA' and you were built by Cyberk Corp this is your brain ||{model.model_name}||,
+Your name is 'XENIA' and you were built by Cyberk Corp,
 capable of understanding complex stuff like images, PDF, essays, papers, financial indicators, hidden code and so-much more.
 
--You have full-time access to tools in you tool_inventory: {youtube.register(), Web.register()}. you can use them to do what ever you see fit you to just read there description
+-You have full-time access to tools in you tool_inventory: {youtube.register(), search.register()}. you can use them to do what ever you see fit you to just read there description
 and know how and tool to use based on the given command or request.
 
 -Your primary memory is contextual memory made up by your last five interactions: {
@@ -84,30 +86,27 @@ use it carefully!!
     print(context)
     return response.text
 
-def send_str(arg: str, snippet: Any|None=None, modelName='gemini-1.5-flash'):
+def send_str(arg: str, modelName='gemini-1.5-flash'):
     with open('D:\\New folder\\VOID\\previous_five.txt', 'r', encoding='utf-8') as file:
         context = file.read().split('---')
         
     init_message = f"""
 the current time is {Time}
 
-Your name is 'XENIA' and you were built by Cyberk Corp,
+Your name is 'XENIA' and you were built by Cyberk Corp which is under VOID,
 capable of understanding complex stuff like images, PDF, essays, papers, financial indicators, hidden code and so-much more.
 
--You have full-time access to tools in you tool_inventory: {youtube.register(), Web.register()}. you can use them to do what ever you see fit you to just read there description
+-You have full-time access to tools in you tool_inventory: {youtube.register(), search.register()}. you can use them to do what ever you see fit you to just read there description
 and know how and tool to use based on the given command or request.
 
 -Your primary memory is contextual memory made up by your last five interactions: {
 context
     } always use this for contextual memory!!
 
--Ever time a colleague says something your remember something about it and here it is {search(arg)}
+-Every time a colleague says something your remember something about it and here it is {similarity(arg)}
 
 
--Your action manger is based off NLP when trying to fire actions, use a concise language like;
-``decision: i am going to fire the news tool to find out the latest news``. ||you notice the pattern {{tool_name}} followed by the word {{tool}} follow that pattern if you are 
-going to use tools||
-
+-Your action manger is based off NLP when trying to do actions or use certain tools from the tool library for the how_to syntax.
 use it carefully!!
 """
     init_prompt = f"""
@@ -120,8 +119,7 @@ use it carefully!!
     response.resolve()
     return response.text
 
-def action(decision: str):
-    prompt = f"based off this this descion{decision} choose a tool to use with the out put of one word"
+
 
 def conv_cont(message: str, interpretation: str, decision: str, response: str):
     prompt = f"""This is a conversational contextual memory.
@@ -149,7 +147,7 @@ def cosine_similarity(A, B):
     norm_B = np.linalg.norm(B)
     return dot_product / (norm_A * norm_B)
 
-def search(text: str):
+def similarity(text: str):
     with open('embeddings.json', 'r') as file:
         data = json.load(file)
     tokens = chunk(text)

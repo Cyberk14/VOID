@@ -30,12 +30,12 @@ def add_mem_db(vector, token):
 
 def update(switch:bool=False):
     if switch:
-        with open('D:\New folder\VOID\previous_five.txt', 'r') as file:
+        with open('D:/New folder/VOID/previous_five.txt', 'r') as file:
             cont_memory = file.readlines()
             
-        if cont_memory > 5:
+        if len(cont_memory) > 5:
             cont_memory.remove(cont_memory[0])
-        with open('D:\New folder\VOID\previous_five.txt', 'w') as file:
+        with open('D:\\New folder\\VOID\\previous_five.txt', 'w') as file:
             for line in cont_memory:
                 file.write(line)
     return None
