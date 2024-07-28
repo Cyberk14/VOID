@@ -1,117 +1,104 @@
 from youtube_transcript_api import YouTubeTranscriptApi as yta
 from youtubesearchpython import VideosSearch
 from playwright.sync_api import sync_playwright
+from duckduckgo_search import DDGS
+from bs4 import BeautifulSoup
 from typing import Any
 import requests
 import os
 
-
-
-# def tool(func: Any):
-#     def wrapper(*args: Any):
-#         func_name, desc, how_to = func()
-#         tool_list[func_name] = {'description': desc,
-#                                 'how to run': how_to}
-        
-#     return wrapper
-
 class youtube:
     def register(self):
         name = 'Youtube'
-        desc = '''This is used to retrieve videos from youtube and view them'''
-        how_to = 'youtube.run(text: str)'
+        description = '''This is used to retrieve videos from youtube. Examples of how to retrieve data from youtube:
+1. Youtube.run("news update for the market") -> searching for news updates for market.
+2. Youtube.run("Floods in Argentina") -> when searching for floods in Argentina
+3. Youtube.run("Summary of 2022 world cup") -> when searching for 2022 world cup summary'''
+        how_to = 'Youtube.run("")'
         
-        return name, desc, how_to
+        return {'name': name, 'description': description, 'how to': how_to}
     def run(self, text: str):
-        links = VideosSearch(text, limit=1).result()
-        id, title = links['result'][0]['id'], links['result'][0]['title']
-        
-        vid = yta.get_transcript(id)
-        
-        transcript = []
-        for text in vid:
-            text = text['text']
-            transcript.append(text)
+
+        print("searching youtube")
+        try:
+            links = VideosSearch(text, limit=1).result()
+            id, title = links['result'][0]['id'], links['result'][0]['title']
             
-        transcript = " ".join(transcript)
-        video = {'title': title, 'content': transcript}
-        return video
-    
+            vid = yta.get_transcript(id)
+            
+            transcript = []
+            for text in vid:
+                text = text['text']
+                transcript.append(text)
+                
+            transcript = " ".join(transcript)
+
+            
+            video = {'title': title, 'content': transcript}
+            return video
+        
+        except Exception as error:
+            print(f"An error occurred: {error}")
+            
+            return error
+
 class search:
     def register(self):
         name = 'Search'
-        desc = """A tool used to browse the web as a real human would."""
-        how_to = 'search.run(query: str)'
+        description = """A tool used to browse the web as a real human would.
+# The line `print("searching")` is a print statement in Python that outputs the message
+# "searching" to the console. It is used as a way to indicate that the program is
+# currently searching for something when the `run` method of the `search` class is
+# executed.
+Here are som examples of how to run the search tool:
+1. Search.run('sentiment on the gold market today') -> when searching for sentiment analysis of the gold market that day.
+2. Search.run('When is the date for the us budget reading.') -> when searching for the specific date of the us budget reading."""
+        how_to = 'Search.run("")'
         
-        return name, desc, how_to
-    
-    def run(self, query):
-        with sync_playwright() as pw:
-            browser = pw.chromium.launch(headless=False)
-            context = browser.new_context(viewport={"width": 920, "height": 500})
-            page = context.new_page()
+        return {'name': name, 'description': description, 'how to': how_to}
 
-            page.goto("https://finance.yahoo.com", timeout=0)  # go to url
-
-            content = page.content()
-            soup = BeautifulSoup(content, 'html.parser')
-            page.close()
-
-        header_element = str(soup.find_all(class_="module-hero hero-3-col svelte-6i0owd"))
-        header_element = BeautifulSoup(header_element, 'html.parser')
-
-        a_tags = header_element.find_all('a')
-        scrape = []
-
-        for tag in a_tags:
-            title = tag.get('title')
-            href = tag.get('href')
+    def run(self, text: str):
+        import time
+        try:
+            # The line `print("searching")` is a print statement in Python that outputs the message
+            # "searching" to the console. It is used as a visual indicator to show that the program is
+            # currently searching for something.
+            print("searching")
+            results = DDGS().text(text, region='wt-wt', safesearch='off', timelimit='y', max_results=1)[0]['href']
             
-            scrape.append({title: href})
-            print({title: href})
+            time.sleep(4)
+            print(results)
+            with sync_playwright() as pw:
+                browser = pw.chromium.launch(headless=False)
+                context = browser.new_context(viewport={"width": 920, "height": 500})
+                page = context.new_page()
+
+                page.goto(results, timeout=0)  # go to url
+                content = page.content()
+                soup = BeautifulSoup(content, 'html.parser')
+                page.close()
+
+            p_tags = soup.find_all('p')
             
-
-        # Remove duplicates
-        unique_data = []
-        seen_items = set()
-        for item in scrape:
-            for key, value in item.items():
-                if (key, value) not in seen_items:
-                    seen_items.add((key, value))
-                    unique_data.append(item)
-
+            return p_tags
+        except Exception as error:
+            print('An error occurred when running Search: ', error)
+            
 ApiKey = "LRUBTT8K83R72KNM"
 class AlphaVantage:
     def register(self):
         name = 'AlphaVantage'
-        desc = "used to fetch ticker data from AlphaVantage Api"
+        description = "used to fetch ticker data from AlphaVantage Api"
         how_to = 'AlphaVantage.run(ticker: str)'
 
-        return name, desc, how_to
-    def run(self, ticker):
+        return {'name': name, 'description': description, 'how to': how_to}
+    
+    def run(self, ticker: str):
         self.ticker = ticker
         self.prompt = f"""
-            You are a market trend detective! Your mission is to analyze the provided historical market data (OHLCV format) and crack the case of the current and potential future trends.
-
-Sharpen your tools:
-
-Moving Averages: {self.MVdata()} Calculate SMAs for various periods (e.g., 50-day, 200-day) and compare price action to identify uptrends, downtrends, or sideways movement.
-Support & Resistance: Look for historical price action patterns to pinpoint support and resistance levels. Uptrends break above resistance, downtrends break below support, and sideways movement bounces between those levels.
-Volume Analysis: Watch how trading volume interacts with price movements. Increasing volume on upticks and decreasing volume on pullbacks suggest uptrends. The opposite suggests downtrends, with a caveat for potential bear traps. Sideways movement often has consistent volume.
-Bonus Tools: Consider technical indicators like RSI and MACD for additional confirmation.
-Present your findings:
-
-Classify the current trend (uptrend, downtrend, sideways).
-Explain your reasoning based on the evidence gathered from moving averages, support & resistance, and volume analysis.
-Briefly discuss the possibility of a trend reversal based on the current market conditions.
-Remember:
-
-Technical analysis has limitations, and the market is inherently unpredictable.
-Account for outliers and data gaps in the provided data.
-Case in point:
-
-Analyze the provided OHLCV data {self.yesterdayData()} for {self.ticker} and become the ultimate trend detective! Unveil the current market trend, explain your reasoning, and assess the chances of a future shift.
-        """
+This is the data of the ticker: {self.ticker},
+OHLCV data: {self.yesterdayData()},
+Moving Average Data: {self.MVdata()}"""
         
     
     def yesterdayData(self):
@@ -123,3 +110,4 @@ Analyze the provided OHLCV data {self.yesterdayData()} for {self.ticker} and bec
     def MVdata(self): 
         pass
     
+

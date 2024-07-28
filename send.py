@@ -17,17 +17,17 @@ for num in nums:
 
 names = phone_book.keys()
 
-messg = []
+msg = []
 for name in names:
     text = f"Hello {name}, this is a robot texting you so please calm down as the age of AI has arrived!!!!"
     text = text.replace(" ", "%20")
-    messg.append(text)
+    msg.append(text)
 
 
 def main():
     i = 0
-    while i != len(messg):
-        web.open_new_tab(f"https://wa.me/{phone_nums[i]}?text={messg[i]}")
+    while i != len(msg):
+        web.open_new_tab(f"https://wa.me/{phone_nums[i]}?text={msg[i]}")
         sleep(30)
         pyg.press("enter")
         i+=1

@@ -1,3 +1,70 @@
+import asyncio
+from duckduckgo_search import DDGS
+from playwright.sync_api import sync_playwright
+from bs4 import BeautifulSoup
+import time
+import random
+
+# Set the event loop policy to WindowsProactorEventLoopPolicy for compatibility
+if hasattr(asyncio, 'WindowsProactorEventLoopPolicy'):
+    asyncio.set_event_loop_policy(asyncio.WindowsProactorEventLoopPolicy())
+
+class Searcher:
+    def human_like_wait(self, min_delay=2, max_delay=5):
+        time.sleep(random.uniform(min_delay, max_delay))
+
+    def run(self, text: str):
+        try:
+            print("searching")
+            results = DDGS().text(text, region='wt-wt', safesearch='off', timelimit='y', max_results=1)
+            
+            if not results:
+                print("No results found.")
+                return []
+
+            url = results[0]['href']
+            print(url)
+
+            self.human_like_wait()
+
+            with sync_playwright() as pw:
+                browser = pw.chromium.launch(headless=True)
+                context = browser.new_context(
+                    viewport={"width": 920, "height": 500},
+                    user_agent='Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
+                    locale='en-US',
+                    timezone_id='America/New_York'
+                )
+                page = context.new_page()
+
+                page.goto(url, timeout=0)
+
+                # Simulate human-like interaction
+                self.human_like_wait()
+                page.mouse.move(100, 200)
+                self.human_like_wait()
+                page.mouse.move(300, 400)
+                self.human_like_wait()
+
+                # Wait for the page to load
+                page.wait_for_load_state('networkidle')
+                content = page.content()
+                page.close()
+                context.close()
+                browser.close()
+
+            soup = BeautifulSoup(content, 'html.parser')
+            p_tags = [p.get_text() for p in soup.find_all('p')]
+            
+            return p_tags
+        except Exception as error:
+            print('An error occurred when running Search: ', error)
+
+# Example usage
+searcher = Searcher()
+text_to_search = "gold market sentiment articles"
+p_tags = searcher.run(text_to_search)
+print(p_tags)
 
 
 
@@ -68,74 +135,29 @@
 # plt.title("Entity-Relationship Graph")
 # plt.show()
 
+# from playwright.sync_api import sync_playwright
+# from bs4 import BeautifulSoup
 
-
-
-
-# from typing import Any, List
-# from tools import youtube, search
-
-# import re
-
-# # Step 1: Define multiple functions
-# def call(name: str):
-#     print(f"Calling {name}...")
-
-# def text(message: str):
-#     print(f"Texting: {message}")
-
-# def shoot(target: str):
-#     print(f"Shooting at {target}")
-
-# # Step 2: Create a mapping of function names to functions
-# function_map = {
-#     "call": call,
-#     "text": text,
-#     "shoot": shoot
-# }
-
-# # Step 3: Create a random string with potential function calls
-# random_string = "I will use the call func to try and call Alice call('Alice'))"
-
-# # Step 4: Use regular expressions to find and extract function calls
-# pattern = r"(call|text|shoot)\([\'\"](.*?)[\'\"]\)"
-# matches = re.findall(pattern, random_string)
-
-# # Step 5: Execute each extracted function call using the mapping
-# print(matches)
-
-
-# foo = ['a', 'b', 'c', 'd']
-
-# goo = ['goon', 'foon']
-
-# hee = ['haaa', 'heee', 'hooo']
-# for z in hee:
-#     for x in goo:
-#         for y in foo:
-#             if y == 'd' or 'heee' or 'goon':
-                
-#             print([z, x, y])
-from youtube_transcript_api import YouTubeTranscriptApi as yta
-from youtubesearchpython import VideosSearch
-
-def run(text: str):
-    links = VideosSearch(text, limit=1).result()
-    id, title = links['result'][0]['id'], links['result'][0]['title']
+# def run():
+#     # results = DDGS().text('live free or die filetype:pdf', region='wt-wt', safesearch='off', timelimit='y', max_results=1)
     
-    vid = yta.get_transcript(id)
     
-    transcript = []
-    for text in vid:
-        text = text['text']
-        transcript.append(text)
-        
-    transcript = " ".join(transcript)
-    video = {'title': title, 'content': transcript}
-    return video
-tex = 'a'
+#     with sync_playwright() as pw:
+#         browser = pw.chromium.launch(headless=False)
+#         context = browser.new_context(viewport={"width": 920, "height": 500})
+#         page = context.new_page()
 
-for i in tex:
-    exec("vid = run('tesla stock price today')", globals())
+#         page.goto("https://finance.yahoo.com", timeout=0)  # go to url
 
-print(vid)
+#         content = page.content()
+#         soup = BeautifulSoup(content, 'html.parser').get_text()
+#         page.close()
+#         print(soup)
+#     return soup
+
+
+
+# run()
+import time
+
+
