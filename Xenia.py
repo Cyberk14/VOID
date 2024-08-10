@@ -7,6 +7,6 @@ if __name__ == "__main__":
         try:
             xenia = Brain()
             xenia.respond()
-            # speak()
+            speak()
         except Exception as error:
             print('An error occurred: ', error)

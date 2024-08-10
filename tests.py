@@ -1,72 +1,131 @@
-import asyncio
-from duckduckgo_search import DDGS
-from playwright.sync_api import sync_playwright
-from bs4 import BeautifulSoup
-import time
 import random
 
-# Set the event loop policy to WindowsProactorEventLoopPolicy for compatibility
-if hasattr(asyncio, 'WindowsProactorEventLoopPolicy'):
-    asyncio.set_event_loop_policy(asyncio.WindowsProactorEventLoopPolicy())
+# Define the size of the grid
+GRID_SIZE = 5
 
-class Searcher:
-    def human_like_wait(self, min_delay=2, max_delay=5):
-        time.sleep(random.uniform(min_delay, max_delay))
+# Define the possible moves (up, down, left, right)
+MOVES = ["UP", "DOWN", "LEFT", "RIGHT"]
 
-    def run(self, text: str):
-        try:
-            print("searching")
-            results = DDGS().text(text, region='wt-wt', safesearch='off', timelimit='y', max_results=1)
+# Define the car class
+class Car:
+    def __init__(self, x, y):
+        self.x = x
+        self.y = y
+    
+    def move(self, direction):
+        if direction == "UP" and self.y < GRID_SIZE - 1:
+            self.y += 1
+        elif direction == "DOWN" and self.y > 0:
+            self.y -= 1
+        elif direction == "LEFT" and self.x > 0:
+            self.x -= 1
+        elif direction == "RIGHT" and self.x < GRID_SIZE - 1:
+            self.x += 1
+    
+    def __str__(self):
+        return f"Car is at ({self.x}, {self.y})"
+
+# Initialize the car at a random position
+car = Car(random.randint(0, GRID_SIZE - 1), random.randint(0, GRID_SIZE - 1))
+
+# Simulate the car moving around the grid
+for _ in range(10):
+    move = random.choice(MOVES)
+    car.move(move)
+    print(f"Move: {move}")
+    print(car)
+
+# import asyncio
+# from ipaddress import v4_int_to_packed
+# from duckduckgo_search import DDGS
+# from playwright.sync_api import sync_playwright
+# from bs4 import BeautifulSoup
+# import time
+# import random
+
+# # Set the event loop policy to WindowsProactorEventLoopPolicy for compatibility
+# if hasattr(asyncio, 'WindowsProactorEventLoopPolicy'):
+#     asyncio.set_event_loop_policy(asyncio.WindowsProactorEventLoopPolicy())
+
+# class Searcher:
+#     def human_like_wait(self, min_delay=2, max_delay=5):
+#         time.sleep(random.uniform(min_delay, max_delay))
+
+#     def get_links(self, text: str):
+#         try:
+#             results = DDGS().text(text+'articles', region='wt-wt', safesearch='off', timelimit='y', max_results=2)
             
-            if not results:
-                print("No results found.")
-                return []
+#             return results[0]['href'], results[1]['href']
 
-            url = results[0]['href']
-            print(url)
+#         except Exception as error:
+#             print('An error occured:\n', error)
+#             return None
 
-            self.human_like_wait()
+#     def run(self, url: str):
+#         try:
+#             print("searching")
+#             self.human_like_wait()
 
-            with sync_playwright() as pw:
-                browser = pw.chromium.launch(headless=True)
-                context = browser.new_context(
-                    viewport={"width": 920, "height": 500},
-                    user_agent='Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
-                    locale='en-US',
-                    timezone_id='America/New_York'
-                )
-                page = context.new_page()
+#             with sync_playwright() as pw:
+#                 browser = pw.chromium.launch(headless=True)
+#                 context = browser.new_context(
+#                     viewport={"width": 920, "height": 500},
+#                     user_agent='Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
+#                     locale='en-US',
+#                     timezone_id='America/New_York'
+#                 )
+#                 page = context.new_page()
 
-                page.goto(url, timeout=0)
+#                 page.goto(url, timeout=0)
 
-                # Simulate human-like interaction
-                self.human_like_wait()
-                page.mouse.move(100, 200)
-                self.human_like_wait()
-                page.mouse.move(300, 400)
-                self.human_like_wait()
+#                     # Simulate human-like interaction
+#             # The code snippet `self.human_like_wait()` followed by `page.mouse.move(100, 200)` and
+#             # another `self.human_like_wait()` followed by `page.mouse.move(300, 400)` is simulating
+#             # human-like interaction with the web page during web scraping.
+#                 self.human_like_wait()
+#                 page.mouse.move(100, 200)
+#                 self.human_like_wait()
+#                 page.mouse.move(300, 400)
+#                 self.human_like_wait()
 
-                # Wait for the page to load
-                page.wait_for_load_state('networkidle')
-                content = page.content()
-                page.close()
-                context.close()
-                browser.close()
+#                 # Wait for the page to load
+#                 page.wait_for_load_state('networkidle')
+#                 content = page.content()
+#                 page.close()
+#                 context.close()
+#                 browser.close()
 
-            soup = BeautifulSoup(content, 'html.parser')
-            p_tags = [p.get_text() for p in soup.find_all('p')]
+#             soup = BeautifulSoup(content, 'html.parser')
+#             # p_tags = [p.get_text() for p in soup.find_all('p')]
             
-            return p_tags
-        except Exception as error:
-            print('An error occurred when running Search: ', error)
+#             # text = " ".join(p_tags)
+#             text = soup.getText()
+#             return text
+#         except Exception as error:
+#             print('An error occurred when running Search: ', error)
 
 # Example usage
-searcher = Searcher()
-text_to_search = "gold market sentiment articles"
-p_tags = searcher.run(text_to_search)
-print(p_tags)
+# searcher = Searcher()
+# text = "compnies in the renewable-energy sector srticles 2024"
+# results = DDGS().text(text+'articles', region='wt-wt', safesearch='off', timelimit='y', max_results=2)
 
+# url1, url2 = results[0]['href'], results[1]['href']
+# print(url1, url2)
 
+# text1, text2 = searcher.run(url1), searcher.run(url2)
+
+# print(text1)
+# print('----------------------------------------------------------------------')
+# print(text2)
+
+# searcher = Searcher()
+# links = searcher.get_links('updates on the robotaxi of tesla motors')
+
+# results = []
+# for link in links:
+#     text = searcher.run(link)
+#     results.append(text)
+# print(results)
 
 # import matplotlib.pyplot as plt
 # import networkx as nx
@@ -126,6 +185,7 @@ print(p_tags)
 # for source, relationship, target in relationships:
 #     G.add_edge(source, target, type=relationship)
 
+# print(G.graph)
 # # Draw the graph
 # pos = nx.spring_layout(G, seed=42)  # positions for all nodes
 # plt.figure(figsize=(15, 10))

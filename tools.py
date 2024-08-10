@@ -4,8 +4,54 @@ from playwright.sync_api import sync_playwright
 from duckduckgo_search import DDGS
 from bs4 import BeautifulSoup
 from typing import Any
+import google.generativeai as genai
 import requests
 import os
+import asyncio
+
+
+os.environ["API_KEY"] = "AIzaSyA8j9C2iflu3S-xFNg0KJfNSjeBpKvpzXY"
+genai.configure(api_key=os.environ['API_KEY'])
+
+def knowledge_graph(text: str):
+    prompt = f"""extract entities as instances, relationships as predicates in this format:
+for example:
+[ 
+    ("Retail traders", "are in", "long positions"),
+    ("Retail traders", "are in", "short positions"),
+    ("Short positions", "ratio of", "1.01 to 1, short-to-long"),
+    ("Long positions", "decreased by", "13.24% since yesterday"),
+    ("Long positions", "decreased by", "13.73% over the past week"),
+    ("Short positions", "increased by", "8.36% daily"),
+    ("Short positions", "increased by", "6.44% weekly"),
+    ("Net-short positioning", "implies potential for", "Gold price appreciation"),
+    ("Short bias", "strengthens", "contrarian bullish view on Gold"),
+    ("Retail traders", "are net-long", "US Crude Oil"),
+    ("Long positions", "outweigh", "short positions, 1.40 to 1"),
+    ("Net-long traders", "decreased by", "0.43% daily"),
+    ("Net-long traders", "increased by", "7.19% weekly"),
+    ("Net-short traders", "grown by", "4.31% since yesterday"),
+    ("Net-short traders", "declined by", "14.98% over the week"),
+    ("Net-long majority", "implies potential for", "US Crude price decreases"),
+    ("Short-term and medium-term changes", "yield ambiguous outlook for", "Oil - US Crude"),
+    ("Retail trader data", "reveals", "bearish tilt, S&P 500"),
+    ("Net-long traders", "grown by", "13.58% since yesterday"),
+    ("Net-long traders", "grown by", "6.75% over the week"),
+    ("Net-short traders", "declined by", "8.07% daily"),
+    ("Net-short traders", "declined by", "2.91% weekly"),
+    ("Dominant net-short sentiment", "suggests continued", "US 500 price appreciation"),
+    ("Decline in net-short positions", "indicates possible reversal in", "current US 500 uptrend"),
+    ("DailyFX", "provides", "forex news and technical analysis"),
+    ("Nick Cawley", "contact via", "Twitter @nickcawley1")
+]
+alert: display only list of tuples as they are the only ones needed no additional text needed as plain text.
+Now, respond to this text:[{text}], 
+
+response: """
+    model = genai.GenerativeModel(model_name='models/gemini-1.5-pro')
+    response = model.generate_content(prompt) 
+    response.resolve()
+    return response.text
 
 class youtube:
     def register(self):
@@ -32,10 +78,10 @@ class youtube:
                 transcript.append(text)
                 
             transcript = " ".join(transcript)
-
             
-            video = {'title': title, 'content': transcript}
-            return video
+            knowledge = knowledge_graph(transcript)
+            
+            return knowledge
         
         except Exception as error:
             print(f"An error occurred: {error}")
@@ -57,32 +103,58 @@ Here are som examples of how to run the search tool:
         
         return {'name': name, 'description': description, 'how to': how_to}
 
-    def run(self, text: str):
-        import time
+    def duck_search(self, text: str):
         try:
-            # The line `print("searching")` is a print statement in Python that outputs the message
-            # "searching" to the console. It is used as a visual indicator to show that the program is
-            # currently searching for something.
             print("searching")
-            results = DDGS().text(text, region='wt-wt', safesearch='off', timelimit='y', max_results=1)[0]['href']
+            results = DDGS().text(text, region='wt-wt', safesearch='off', timelimit='y', max_results=2)
             
-            time.sleep(4)
-            print(results)
+            return results[0]['href'], results[1]['href']
+        
+        except Exception as error:
+            print(f'An error occurred in DDGS: {error}')
+            return None
+        
+    def play_Wright(self, url: str):
+        try:
             with sync_playwright() as pw:
-                browser = pw.chromium.launch(headless=False)
+                browser = pw.chromium.launch(headless=True)
                 context = browser.new_context(viewport={"width": 920, "height": 500})
                 page = context.new_page()
 
-                page.goto(results, timeout=0)  # go to url
+                page.goto(url, timeout=0)  # go to URL
                 content = page.content()
-                soup = BeautifulSoup(content, 'html.parser')
+                
                 page.close()
-
+            soup = BeautifulSoup(content, 'html.parser')
             p_tags = soup.find_all('p')
-            
-            return p_tags
+            text = " ".join(tags.get_text() for tags in p_tags)
+
+            return text
+        
         except Exception as error:
-            print('An error occurred when running Search: ', error)
+            print(f'An error occurred in play_wright: {error}')
+            return None
+
+    def run(self, text: str):
+        if hasattr(asyncio, 'WindowsProactorEventLoopPolicy'):
+            asyncio.set_event_loop_policy(asyncio.WindowsProactorEventLoopPolicy())
+            
+            urls = self.duck_search(text)
+
+            knowledge = []
+
+            for url in urls:
+                text = self.play_Wright(url)
+            
+                results = knowledge_graph(' '.join(text))
+
+                knowledge.append(results)
+
+            return knowledge
+        
+        # except Exception as error:
+        #     print('An error occurred when running Search: ', error)
+        #     return None
             
 ApiKey = "LRUBTT8K83R72KNM"
 class AlphaVantage:

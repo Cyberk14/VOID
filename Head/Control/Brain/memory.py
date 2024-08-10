@@ -62,15 +62,5 @@ Now, respond to this text:[{text}], response:"""
     
     return response
 
-def update(switch:bool=False):
-    if switch:
-        with open('D:/New folder/VOID/previous_five.txt', 'r', encoding='utf-8') as file:
-            cont_memory = file.readlines()
-            
-        if len(cont_memory) > 5:
-            cont_memory.remove(cont_memory[0])
-        with open('D:\\New folder\\VOID\\previous_five.txt', 'w', encoding='utf-8') as file:
-            for line in cont_memory:
-                file.write(line)
-    return None
+
 

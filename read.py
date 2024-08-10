@@ -20,6 +20,6 @@ def pdf_to_text(pdf_path, output_text_file):
 # Usage
 
 
-pdf_path = 'D:\\New folder\\VOID\\Pdf_files\\TheTeslaCoil-Gerekos.pdf'
+pdf_path = 'D:\\New folder\\VOID\\VOID.pdf'
 output_text_file = 'output_text_file.txt'
 pdf_to_text(pdf_path, output_text_file)

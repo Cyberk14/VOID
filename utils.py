@@ -1,4 +1,4 @@
-from sre_constants import ANY_ALL
+
 from typing import List, Any
 from pyht import Client, TTSOptions, Format
 from io import BytesIO
@@ -22,21 +22,24 @@ Youtube, Search, Alpha_vantage = youtube(), search(), AlphaVantage()
 Time = (lambda: time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()))()
 
 def text_to_speech_file(text: str, file_path: str="D:\\New folder\\VOID\\agent_voice.mp3"):
-    client = Client("Didb3xzYmNUM5QH4nZyxzoSIlio2", "82cbdc7000a848739a86affc988171cb")
+    try:
+        client = Client("Didb3xzYmNUM5QH4nZyxzoSIlio2", "82cbdc7000a848739a86affc988171cb")
 
-    options = TTSOptions(voice="s3://voice-cloning-zero-shot/a59cb96d-bba8-4e24-81f2-e60b888a0275/charlottenarrativesaad/manifest.json", sample_rate=44_100, format=Format.FORMAT_MP3,temperature= 0.8, speed=.9)
-    text = text
+        options = TTSOptions(voice="s3://voice-cloning-zero-shot/a59cb96d-bba8-4e24-81f2-e60b888a0275/charlottenarrativesaad/manifest.json", sample_rate=44_100, format=Format.FORMAT_MP3,temperature= 0.8, speed=.9)
+        text = text
 
-    audio_stream = BytesIO()
-    for chunk in client.tts(text=text, voice_engine="PlayHT2.0-turbo", options=options):
-        audio_stream.write(chunk)
-        
-    audio_stream.seek(0)
+        audio_stream = BytesIO()
+        for chunk in client.tts(text=text, voice_engine="PlayHT2.0-turbo", options=options):
+            audio_stream.write(chunk)
+            
+        audio_stream.seek(0)
 
-    with open(file_path, 'wb') as file:
-        file.write(audio_stream.read())
-        file.close()
-        
+        with open(file_path, 'wb') as file:
+            file.write(audio_stream.read())
+            file.close()
+    except Exception as error:
+        print(f'An error occurred with audio: {error}')
+        return None
 
 def send_img(arg: str, image: str):
     image = PIL.Image.open(image)
@@ -49,14 +52,15 @@ the current time is {Time}
 Your name is 'XENIA' and you were built by Cyberk Corp which is under VOID,
 capable of understanding complex stuff like images, PDF, essays, papers, financial indicators, hidden code and so-much more.
 
--You have full-time access to tools in you tool_inventory: {Youtube.register(), Search.register()}. you can use them to do what ever you see fit you to just read there description
+-You have full-time access to tools in you tool_inventory: {Youtube.register(), Search.register(), Alpha_vantage.register()}. you can use them to do what ever you see fit you to just read there description
 and know how and tool to use based on the given command or request.
 
 -Your primary memory is contextual memory made up by your last five interactions: {
 context
     } always use this for contextual memory!!
 
--Every time a colleague says something your remember something about it and here it is {similarity(arg)}
+-Every time a colleague says something your remember something about it and here it is try:
+            
 """
     init_prompt = f"""
     ``{init_message}`` <- this is a system prompt no need to display its contents always and always First refer to this before any thing else.\\
@@ -93,7 +97,8 @@ and know how and tool to use based on the given command or request.
 context
     } always use this for contextual memory!!
 
--Every time a colleague says something your remember something about it and here it is {similarity(arg)}
+-Every time a colleague says something your remember something about it and here it is try:
+            
 """
     init_prompt = f"""
     ``{init_message}`` <- this is a system prompt no need to display its contents always and always First refer to this before any thing else.\\
@@ -105,43 +110,6 @@ context
     response.resolve()
     return response.text
 
-def knowledge_graph(text: str):
-    prompt = f"""extract entities as instances, relationships as predicates in this format:
-for example:
-[ 
-    ("Retail traders", "are in", "long positions"),
-    ("Retail traders", "are in", "short positions"),
-    ("Short positions", "ratio of", "1.01 to 1, short-to-long"),
-    ("Long positions", "decreased by", "13.24% since yesterday"),
-    ("Long positions", "decreased by", "13.73% over the past week"),
-    ("Short positions", "increased by", "8.36% daily"),
-    ("Short positions", "increased by", "6.44% weekly"),
-    ("Net-short positioning", "implies potential for", "Gold price appreciation"),
-    ("Short bias", "strengthens", "contrarian bullish view on Gold"),
-    ("Retail traders", "are net-long", "US Crude Oil"),
-    ("Long positions", "outweigh", "short positions, 1.40 to 1"),
-    ("Net-long traders", "decreased by", "0.43% daily"),
-    ("Net-long traders", "increased by", "7.19% weekly"),
-    ("Net-short traders", "grown by", "4.31% since yesterday"),
-    ("Net-short traders", "declined by", "14.98% over the week"),
-    ("Net-long majority", "implies potential for", "US Crude price decreases"),
-    ("Short-term and medium-term changes", "yield ambiguous outlook for", "Oil - US Crude"),
-    ("Retail trader data", "reveals", "bearish tilt, S&P 500"),
-    ("Net-long traders", "grown by", "13.58% since yesterday"),
-    ("Net-long traders", "grown by", "6.75% over the week"),
-    ("Net-short traders", "declined by", "8.07% daily"),
-    ("Net-short traders", "declined by", "2.91% weekly"),
-    ("Dominant net-short sentiment", "suggests continued", "US 500 price appreciation"),
-    ("Decline in net-short positions", "indicates possible reversal in", "current US 500 uptrend"),
-    ("DailyFX", "provides", "forex news and technical analysis"),
-    ("Nick Cawley", "contact via", "Twitter @nickcawley1")
-]
-alert: display only list of tuples as they are the only ones needed no additional text needed.
-Now, respond to this text:[{text}], response: """
-    model = genai.GenerativeModel(model_name='models/gemini-1.5-pro')
-    response = model.generate_content(prompt) 
-    response.resolve()
-    return response.text
 
 def action(decision: str):
     tools = Youtube.register()['name'],Search.register()['name']
@@ -156,11 +124,10 @@ def action(decision: str):
         return result
     return None
 
-def conv_cont(message: str, interpretation: str, decision: str, response: str):
+def conv_cont(message: str,  decision: str, response: str):
     prompt = f"""This is a conversational contextual memory.
 
     I received the following prompt: "{message}".
-    I interpreted it as: "{interpretation}".
     Based on this interpretation and the prompt, I decided: "{decision}".
     and I responded with: {response}
 """
