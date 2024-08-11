@@ -1,10 +1,10 @@
 # this will be used to process the input from the "Input" folder for storage, re-use and output!
 
-import utils
+
 import tools
 from Head.Input.ears import listen
 from Head.Input.eyes import see
-from .memory import long_term_mem
+from . import memory
 
 from typing import Any
 from termcolor import colored
@@ -40,7 +40,7 @@ class Brain:
 
             knowledge = tools.knowledge_graph(text)
 
-            long_term_mem(switch=True, knowledge)
+            memory.long_term_mem(knowledge, switch=True)
 
 
             print(knowledge_graph)
@@ -53,7 +53,7 @@ User/Fellow Agent's self.Message: "{self.message}"
 
 In this stage is where tools are used then there response is gathered.
 
-here are the tools {utils.Youtube.register(), utils.Search.register()} read the ``description`` and follow the ``how to``, let's think step by step
+here are the tools {memory.utils.Youtube.register(), utils.Search.register()} read the ``description`` and follow the ``how to``, let's think step by step
 
 - Call the tool displaying there how_to according argument
 - Display only the decision nothing else.

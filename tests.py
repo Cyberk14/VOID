@@ -1,39 +1,39 @@
-import random
+# import random
 
-# Define the size of the grid
-GRID_SIZE = 5
+# # Define the size of the grid
+# GRID_SIZE = 5
 
-# Define the possible moves (up, down, left, right)
-MOVES = ["UP", "DOWN", "LEFT", "RIGHT"]
+# # Define the possible moves (up, down, left, right)
+# MOVES = ["UP", "DOWN", "LEFT", "RIGHT"]
 
-# Define the car class
-class Car:
-    def __init__(self, x, y):
-        self.x = x
-        self.y = y
+# # Define the car class
+# class Car:
+#     def __init__(self, x, y):
+#         self.x = x
+#         self.y = y
     
-    def move(self, direction):
-        if direction == "UP" and self.y < GRID_SIZE - 1:
-            self.y += 1
-        elif direction == "DOWN" and self.y > 0:
-            self.y -= 1
-        elif direction == "LEFT" and self.x > 0:
-            self.x -= 1
-        elif direction == "RIGHT" and self.x < GRID_SIZE - 1:
-            self.x += 1
+#     def move(self, direction):
+#         if direction == "UP" and self.y < GRID_SIZE - 1:
+#             self.y += 1
+#         elif direction == "DOWN" and self.y > 0:
+#             self.y -= 1
+#         elif direction == "LEFT" and self.x > 0:
+#             self.x -= 1
+#         elif direction == "RIGHT" and self.x < GRID_SIZE - 1:
+#             self.x += 1
     
-    def __str__(self):
-        return f"Car is at ({self.x}, {self.y})"
+#     def __str__(self):
+#         return f"Car is at ({self.x}, {self.y})"
 
-# Initialize the car at a random position
-car = Car(random.randint(0, GRID_SIZE - 1), random.randint(0, GRID_SIZE - 1))
+# # Initialize the car at a random position
+# car = Car(random.randint(0, GRID_SIZE - 1), random.randint(0, GRID_SIZE - 1))
 
-# Simulate the car moving around the grid
-for _ in range(10):
-    move = random.choice(MOVES)
-    car.move(move)
-    print(f"Move: {move}")
-    print(car)
+# # Simulate the car moving around the grid
+# for _ in range(10):
+#     move = random.choice(MOVES)
+#     car.move(move)
+#     print(f"Move: {move}")
+#     print(car)
 
 # import asyncio
 # from ipaddress import v4_int_to_packed
@@ -127,13 +127,15 @@ for _ in range(10):
 #     results.append(text)
 # print(results)
 
-# import matplotlib.pyplot as plt
-# import networkx as nx
+import matplotlib.pyplot as plt
+import networkx as nx
+import tools
 
-# # Initialize a directed graph
-# G = nx.DiGraph()
 
-# # Add entities (nodes) to the graph
+# Initialize a directed graph
+G = nx.DiGraph()
+
+# Add entities (nodes) to the graph
 # entities = [
 #     ("Retail traders", "Group"),
 #     ("Market", "General Term"),
@@ -147,11 +149,11 @@ for _ in range(10):
 #     ("Past week", "Date")
 # ]
 
-# # Add the nodes with entity type as an attribute
+# Add the nodes with entity type as an attribute
 # for entity, entity_type in entities:
 #     G.add_node(entity, type=entity_type)
 
-# # Add relationships (edges) to the graph
+# Add relationships (edges) to the graph
 # relationships = [
 #     ("Retail traders", "are in", "long positions"),
 #     ("Retail traders", "are in", "short positions"),
@@ -181,17 +183,29 @@ for _ in range(10):
 #     ("Nick Cawley", "contact via", "Twitter @nickcawley1")
 # ]
 
+with open('previous_five.txt', 'r') as file:
+    text = file.read()
+    
+knowledge = tools.knowledge_graph(text)
+
+print(knowledge)
 # # Add the edges with relationship type as an attribute
 # for source, relationship, target in relationships:
 #     G.add_edge(source, target, type=relationship)
+    
+#     print(source,'->',relationship,'->',target)
 
-# print(G.graph)
+# print('---------------------------------------------------------------')
+
 # # Draw the graph
-# pos = nx.spring_layout(G, seed=42)  # positions for all nodes
-# plt.figure(figsize=(15, 10))
-# nx.draw(G, pos, with_labels=True, node_color="skyblue", node_size=3000, font_size=10, font_weight="bold", arrows=True, arrowstyle='->', arrowsize=20)
+# # pos = nx.spring_layout(G, seed=42)  # positions for all nodes
+# # plt.figure(figsize=(15, 10))
+# # nx.draw(G, pos, with_labels=True, node_color="skyblue", node_size=3000, font_size=10, font_weight="bold", arrows=True, arrowstyle='->', arrowsize=20)
 # edge_labels = nx.get_edge_attributes(G, 'type')
-# nx.draw_networkx_edge_labels(G, pos, edge_labels=edge_labels, font_size=9, label_pos=0.5)
+
+
+# print(edge_labels)
+# # nx.draw_networkx_edge_labels(G, pos, edge_labels=edge_labels, font_size=9, label_pos=0.5)
 # plt.title("Entity-Relationship Graph")
 # plt.show()
 
