@@ -125,15 +125,13 @@ def action(decision: str):
     return None
 
 def conv_cont(message: str,  decision: str, response: str):
-    prompt = f"""This is a conversational contextual memory.
-
-    I received the following prompt: "{message}".
-    Based on this interpretation and the prompt, I decided: "{decision}".
-    and I responded with: {response}
+    conv = f"""This is a conversational contextual memory.
+    User ---> {message}, 
+    I ---> {response}
 """
-    prompt = prompt.replace('\n', ' ')
+    conv = conv.replace('\n', ' ')
     with open('previous_five.txt', 'a', encoding='utf-8') as file:
-        file.write(prompt+ '\n')
+        file.write(f"{Time} :{conv}")
 
 
 def pad_vectors(A, B):

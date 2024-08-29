@@ -10,8 +10,8 @@ cursor = conn.cursor()
 
 cursor.execute(""" CREATE TABLE IF NOT EXISTS context(Token TEXT NOT NULL, Vector TEXT NOT NULL)""")
 
-def add_mem_db(vector, token):
-    tokens = chunk()
+def add_mem_db(knowledge) -> None:
+    token = chunk()
     vector = embed()
 
     cursor.execute('INSERT INTO MemoryTable (Token, Vector) VALUES (?, ?)', (token, vector))
@@ -23,8 +23,10 @@ def long_term_mem(text, switch: bool = False):
     if not switch:
         return None
 
-    knowledge = tool.knowledge_graph(text)
+    knowledge = tools.knowledge_graph(text)
 
-    for x in range(knowledge):
-        for source, relation, target in knowledge:
-            pass
+
+def index(text: any) -> None:
+    with open('previuos-five.txt', r)
+
+    
