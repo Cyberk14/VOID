@@ -1,0 +1,11 @@
+requests
+pyautogui
+bs4
+google-generativeai
+OpenAi
+youtube-transcript-api
+youtube-search-python
+playwright
+PyMuPDF #fitz
+pygame
+playht
